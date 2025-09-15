@@ -20,24 +20,31 @@
 
             <div class="options-input">
                 <h2>2. 옵션 선택</h2>
-                <div id="table-selection-group" class="option-group" style="display: none;">
-                    <label>
-                        <input type="radio" name="table-option" value="1_table" checked> 1 테이블
-                    </label>
-                    <label>
-                        <input type="radio" name="table-option" value="2_table"> 2 테이블
-                    </label>
-                    <hr style="border-color: #0f3460; margin: 15px 0;">
-                </div>
+                <fieldset id="table-selection-fieldset">
+                    <legend>테이블 선택</legend>
+                    <div class="option-group">
+                        <label>
+                            <input type="radio" name="table-option" value="1_table" checked> 1 테이블
+                        </label>
+                        <label>
+                            <input type="radio" name="table-option" value="2_table"> 2 테이블
+                        </label>
+                    </div>
+                </fieldset>
 
-                <div class="option-group">
-                    <input type="radio" id="dealer-needed" name="dealer-option" value="needed" checked>
-                    <label for="dealer-needed">딜러 필요</label>
-                </div>
-                <div class="option-group">
-                    <input type="radio" id="dealer-not-needed" name="dealer-option" value="not-needed">
-                    <label for="dealer-not-needed">딜러 불필요</label>
-                </div>
+                <hr style="border-color: #0f3460; margin: 15px 0;">
+
+                <fieldset>
+                    <legend>딜러 선택</legend>
+                    <div class="option-group">
+                        <label>
+                            <input type="radio" id="dealer-needed" name="dealer-option" value="needed" checked> 딜러 필요
+                        </label>
+                        <label>
+                            <input type="radio" id="dealer-not-needed" name="dealer-option" value="not-needed"> 딜러 불필요
+                        </label>
+                    </div>
+                </fieldset>
             </div>
         </div>
 
@@ -65,13 +72,10 @@
             </div>
         </div>
     </div>
-
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-    
     <script src="js/firebase-config.js"></script>
     <script src="js/ui.js"></script>
     <script src="js/main.js"></script>
-
 </body>
 </html>

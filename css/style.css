@@ -225,3 +225,8 @@ textarea#nicknames {
     background-color: var(--highlight-color);
     color: white;
 }
+/* ✅ 이 부분만 파일 맨 아래에 추가해주세요 */
+input[type="radio"]:disabled + label {
+    color: #888;
+    cursor: not-allowed;
+}
