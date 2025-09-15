@@ -15,24 +15,51 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- 데이터 로딩 ---
     async function loadSitCardData() {
         try {
-            const response = await fetch('data/sitcard.csv');
+            // ✅ 이 URL이 'raw.githubusercontent.com'을 포함하는 Raw URL인지 다시 한번 확인해주세요!
+            const csvUrl = 'https://raw.githubusercontent.com/handream7/sitcard/refs/heads/main/data/sitcard.csv'; // 여기에 복사한 URL을 붙여넣으세요.
+            const response = await fetch(csvUrl);
+            
+            if (!response.ok) {
+                throw new Error(`네트워크 응답 오류: ${response.status} ${response.statusText}`);
+            }
+
             const text = await response.text();
             parseCSV(text);
         } catch (error) {
             console.error('CSV 파일을 불러오는 데 실패했습니다:', error);
-            UI.showAlert('좌석 데이터를 불러올 수 없습니다.');
+            UI.showAlert('온라인 좌석 데이터를 불러올 수 없습니다. F12를 눌러 콘솔을 확인해주세요.');
         }
     }
 
+    // ✨✨✨ 오류 방어 기능이 추가된 새로운 parseCSV 함수 ✨✨✨
     function parseCSV(text) {
-        const rows = text.split('\n').map(row => row.trim().split(','));
-        // 헤더(2번째 줄)를 기준으로 '딜러불필요' 섹션이 시작되는 열(column) 인덱스를 찾음
-        const dealerNotNeededStartIndex = rows[1].findIndex(header => header.includes('딜러불필요'));
+        // 1. 빈 줄을 먼저 제거해서 데이터의 신뢰성을 높입니다.
+        const rows = text.split('\n')
+            .map(row => row.trim())
+            .filter(row => row) // 빈 줄 삭제
+            .map(row => row.split(','));
 
-        // 3번째 줄부터 실제 데이터 처리
+        // 2. 가장 중요한 헤더(두 번째 줄) 데이터가 있는지 확인합니다.
+        if (rows.length < 2 || !rows[1]) {
+            const errorMessage = "CSV 데이터 형식이 잘못되었습니다. 헤더(두 번째 줄)를 찾을 수 없습니다.";
+            console.error(errorMessage, rows); // 콘솔에 현재 rows 상태를 출력하여 디버깅을 도움
+            throw new Error(errorMessage);
+        }
+
+        const headerRow = rows[1];
+        const dealerNotNeededStartIndex = headerRow.findIndex(header => header.includes('딜러불필요'));
+
+        // 3. '딜러불필요' 키워드를 찾았는지 확인합니다.
+        if (dealerNotNeededStartIndex === -1) {
+            const errorMessage = "'딜러불필요' 키워드를 헤더(두 번째 줄)에서 찾을 수 없습니다.";
+            console.error(errorMessage, headerRow);
+            throw new Error(errorMessage);
+        }
+
+        // 4. 실제 데이터 처리 (세 번째 줄부터)
         for (let i = 2; i < rows.length; i++) {
             const row = rows[i];
-            const playerCountKey = row[0]; // 예: "3명"
+            const playerCountKey = row[0];
             if (!playerCountKey) continue;
 
             const neededSeats = row.slice(2, dealerNotNeededStartIndex).filter(Boolean);
@@ -43,6 +70,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 notNeeded: notNeededSeats
             };
         }
+        console.log("좌석 데이터 파싱 성공:", sitCardData); // 성공 시 콘솔에 로그
     }
 
     // --- 핵심 로직 함수 ---
@@ -72,10 +100,9 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // 닉네임 랜덤 셔플
         const shuffledNicknames = [...nicknames].sort(() => Math.random() - 0.5);
         
-        allSeatsForCurrentGame = [...seats]; // 현재 게임의 전체 좌석 목록 저장
+        allSeatsForCurrentGame = [...seats];
         currentAssignments = [];
 
         for (let i = 0; i < shuffledNicknames.length; i++) {
@@ -109,7 +136,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        const newSeat = availableSeats[0]; // 첫 번째 빈자리에 배정
+        const newSeat = availableSeats[0];
         const newAssignment = { nickname: newNickname, seat: newSeat };
         currentAssignments.push(newAssignment);
         
@@ -129,7 +156,6 @@ document.addEventListener('DOMContentLoaded', () => {
             assignments: currentAssignments
         };
 
-        // Firebase Realtime Database에 저장
         database.ref('sitcard_assignments/' + Date.now()).set(dataToSave)
             .then(() => {
                 UI.showAlert('성공적으로 저장되었습니다!');
