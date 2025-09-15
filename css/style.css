@@ -1,0 +1,226 @@
+@import url('https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700&display=swap');
+
+:root {
+    --bg-color: #1a1a2e;
+    --primary-color: #16213e;
+    --secondary-color: #0f3460;
+    --highlight-color: #e94560;
+    --text-color: #f0f0f0;
+}
+
+body {
+    font-family: 'Nanum Gothic', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.container {
+    width: 100%;
+    max-width: 1200px;
+    background-color: var(--primary-color);
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+h1 {
+    text-align: center;
+    color: var(--highlight-color);
+    margin-bottom: 30px;
+    font-size: 2.5rem;
+}
+
+h2 {
+    color: var(--text-color);
+    border-left: 4px solid var(--highlight-color);
+    padding-left: 10px;
+    margin-bottom: 15px;
+}
+
+.setup-section {
+    display: flex;
+    gap: 30px;
+    margin-bottom: 30px;
+}
+
+.nickname-input, .options-input {
+    flex: 1;
+    background-color: var(--secondary-color);
+    padding: 20px;
+    border-radius: 10px;
+}
+
+textarea#nicknames {
+    width: 100%;
+    height: 200px;
+    background-color: #1a1a2e;
+    border: 1px solid #0f3460;
+    border-radius: 5px;
+    color: var(--text-color);
+    font-size: 1rem;
+    padding: 10px;
+    box-sizing: border-box;
+    resize: vertical;
+}
+
+#player-count {
+    font-weight: bold;
+    color: var(--highlight-color);
+    font-size: 1.2rem;
+}
+
+.option-group {
+    margin-bottom: 10px;
+    font-size: 1.1rem;
+}
+
+.button-container {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+#assign-button {
+    background: linear-gradient(45deg, var(--highlight-color), #f97a90);
+    color: white;
+    border: none;
+    padding: 15px 40px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(233, 69, 96, 0.4);
+}
+
+#assign-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(233, 69, 96, 0.6);
+}
+
+.sitcard-display {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    padding: 20px;
+    min-height: 200px;
+    perspective: 1000px;
+}
+
+.sitcard {
+    width: 150px;
+    height: 210px;
+    background-image: url('../image_96c838.png'); /* 제공된 이미지 경로 */
+    background-size: cover;
+    background-position: center;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: black;
+    font-weight: bold;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    text-align: center;
+    opacity: 0;
+    transform: translateY(100px) rotateX(-90deg);
+    animation: rise-up 0.5s ease-out forwards;
+}
+
+.sitcard .seat-number {
+    font-size: 1.5rem;
+    color: #a30000;
+    margin-bottom: 15px;
+}
+
+.sitcard .nickname {
+    font-size: 1.2rem;
+    background-color: rgba(255, 255, 255, 0.7);
+    padding: 5px 10px;
+    border-radius: 5px;
+    max-width: 90%;
+    word-break: break-all;
+}
+
+@keyframes rise-up {
+    to {
+        opacity: 1;
+        transform: translateY(0) rotateX(0deg);
+    }
+}
+
+.action-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 30px;
+}
+
+.action-btn {
+    background-color: var(--secondary-color);
+    color: var(--text-color);
+    border: 1px solid var(--highlight-color);
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.action-btn:hover:not(:disabled) {
+    background-color: var(--highlight-color);
+    color: white;
+}
+
+.action-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+
+/* 팝업 스타일 */
+.popup-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.popup-content {
+    background-color: var(--primary-color);
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+    text-align: center;
+}
+
+#new-nickname-input {
+    width: 100%;
+    padding: 10px;
+    font-size: 1rem;
+    margin-top: 10px;
+    margin-bottom: 20px;
+    box-sizing: border-box;
+}
+
+.popup-buttons button {
+    padding: 10px 20px;
+    margin: 0 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+#confirm-add-button {
+    background-color: var(--highlight-color);
+    color: white;
+}

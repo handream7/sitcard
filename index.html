@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>싯카드 자동 배정 시스템</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <div class="container">
+        <h1>싯카드 자동 배정 시스템</h1>
+
+        <div class="setup-section">
+            <div class="nickname-input">
+                <h2>1. 닉네임 입력</h2>
+                <textarea id="nicknames" placeholder="한 줄에 한 명씩 닉네임을 입력하세요..."></textarea>
+                <p>총 <span id="player-count">0</span>명</p>
+            </div>
+
+            <div class="options-input">
+                <h2>2. 옵션 선택</h2>
+                <div class="option-group">
+                    <input type="radio" id="dealer-needed" name="dealer-option" value="needed" checked>
+                    <label for="dealer-needed">딜러 필요</label>
+                </div>
+                <div class="option-group">
+                    <input type="radio" id="dealer-not-needed" name="dealer-option" value="not-needed">
+                    <label for="dealer-not-needed">딜러 불필요</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="button-container">
+            <button id="assign-button">✨ 싯카드 배정하기</button>
+        </div>
+
+        <div id="sitcard-display" class="sitcard-display">
+            </div>
+
+        <div class="action-buttons">
+            <button id="re-assign-button" class="action-btn" disabled>🔄️ 재배치</button>
+            <button id="add-player-button" class="action-btn" disabled>🙋‍♂️ 추가 배치</button>
+            <button id="save-button" class="action-btn" disabled>💾 저장</button>
+        </div>
+    </div>
+
+    <div id="add-player-popup" class="popup-container" style="display: none;">
+        <div class="popup-content">
+            <h2>추가 인원 닉네임</h2>
+            <input type="text" id="new-nickname-input" placeholder="추가할 닉네임을 입력하세요">
+            <div class="popup-buttons">
+                <button id="confirm-add-button">추가</button>
+                <button id="cancel-add-button">취소</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    
+    <script src="js/firebase-config.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/main.js"></script>
+
+</body>
+</html>
