@@ -49,10 +49,9 @@ h2 {
     margin-bottom: 15px;
 }
 
-/* ✅ 항상 세로로 표시되도록 flex-direction 변경 */
 .setup-section {
     display: flex;
-    flex-direction: column; /* 가로(row) -> 세로(column)로 변경 */
+    flex-direction: column;
     gap: 30px;
     margin-bottom: 30px;
 }
@@ -297,6 +296,7 @@ hr {
     display: flex;
     justify-content: center;
     gap: 15px;
+    margin-top: 20px;
 }
 .popup-buttons button {
     padding: 10px 20px;
@@ -311,39 +311,43 @@ hr {
 .confirm-btn:hover { background-color: #8a6d6d; }
 .cancel-btn:hover { background-color: #666; }
 
+/* ✅ 저장내역 팝업 스타일 추가 */
+.history-list {
+    max-height: 300px;
+    overflow-y: auto;
+    background-color: #2b2a30;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    padding: 10px;
+    margin-top: 15px;
+    text-align: left;
+}
+.history-item {
+    color: var(--light-text-color);
+    padding: 10px;
+    border-bottom: 1px solid var(--border-color);
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+.history-item:last-child {
+    border-bottom: none;
+}
+.history-item:hover {
+    background-color: var(--box-bg-color);
+}
+
+
 input[type="radio"]:disabled + label { color: #888; cursor: not-allowed; }
 
 .sitcard.sitcard--dealer-a { background-color: #FFFACD; border-color: #E6DBA4; }
 .sitcard.sitcard--dealer-b { background-color: #FFD1DC; border-color: #E8BBC4; }
 .sitcard.sitcard--table-b { background-color: #ADD8E6; border-color: #9AB4C0; }
 
-/* ✅ --- 모바일 화면을 위한 반응형 코드 수정 --- */
 @media (max-width: 768px) {
-    /* 모바일에서 기본 폰트 크기를 살짝 줄여 전체적인 크기를 조절 */
-    html {
-        font-size: 14px;
-    }
-
-    .container {
-        padding: 15px;
-    }
-    
-    h1 {
-        font-size: 2rem;
-    }
-
-    /* setup-section은 이미 세로 정렬이므로 media query에서 제거 */
-
-    .sitcard {
-        width: 120px;
-        height: 168px;
-    }
-
-    .sitcard .seat-number {
-        font-size: 1.3rem;
-    }
-
-    .sitcard .nickname {
-        font-size: 1.0rem;
-    }
+    html { font-size: 14px; }
+    .container { padding: 15px; }
+    h1 { font-size: 2rem; }
+    .sitcard { width: 120px; height: 168px; }
+    .sitcard .seat-number { font-size: 1.3rem; }
+    .sitcard .nickname { font-size: 1.0rem; }
 }

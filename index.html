@@ -63,6 +63,7 @@
             <button id="save-button" class="action-btn">💾 저장</button>
             <button id="lock-button" class="action-btn">🔒 잠금</button>
             <button id="image-save-button" class="action-btn">📸 이미지 저장</button>
+            <button id="load-history-button" class="action-btn">📂 저장내역</button>
         </div>
     </div>
 
@@ -102,6 +103,15 @@
             <p>2테이블로 진행하세요.</p>
             <div class="popup-buttons">
                 <button id="confirm-capacity-button" class="confirm-btn">확인</button>
+            </div>
+        </div>
+    </div>
+    <div id="history-popup" class="popup-container" style="display: none;">
+        <div class="popup-content">
+            <h2>저장 내역 불러오기</h2>
+            <div id="history-list" class="history-list"></div>
+            <div class="popup-buttons">
+                <button id="close-history-button" class="cancel-btn">닫기</button>
             </div>
         </div>
     </div>

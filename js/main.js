@@ -36,20 +36,17 @@ document.addEventListener('DOMContentLoaded', () => {
         UI.updateDealerDropdowns();
     }
 
-    // --- ✅ Firebase 실시간 동기화 (닉네임 목록 추가) ---
+    // --- Firebase 실시간 동기화 ---
     function syncWithFirebase() {
         GAME_DATA_REF.on('value', (snapshot) => {
             const data = snapshot.val();
             if (data) {
-                // 닉네임 목록 동기화
                 UI.nicknamesInput.value = data.nicknamesText || '';
                 currentAssignments = data.assignments || [];
                 UI.displaySitCards(currentAssignments);
                 UI.updateLockState(data.isLocked || false);
-                // 닉네임 목록이 변경되었으므로 UI 업데이트
                 updateOptionsUI();
             } else {
-                // 데이터가 없으면 모두 초기화
                 UI.nicknamesInput.value = '';
                 currentAssignments = [];
                 UI.displaySitCards([]);
@@ -59,7 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- ✅ 핵심 로직: 배정 및 저장 (닉네임 목록 저장 추가) ---
+    // --- 핵심 로직: 배정 및 저장 ---
     function assignAndSaveSeats() {
         let nicknames = UI.getNicknames();
         if (nicknames.length === 0) { UI.showAlert('닉네임을 입력해주세요.'); return; }
@@ -114,7 +111,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const nonDealerAssignments = nonDealerNicknames.map((n, i) => ({ nickname: n, seat: nonDealerSeats[i] }));
         
         const newGameData = {
-            nicknamesText: UI.nicknamesInput.value, // ✅ 닉네임 목록 저장
+            nicknamesText: UI.nicknamesInput.value,
             assignments: [...fixedAssignments, ...nonDealerAssignments],
             isLocked: false,
             timestamp: firebase.database.ServerValue.TIMESTAMP
@@ -162,7 +159,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // 닉네임 목록과 배정 내역을 함께 업데이트
         const currentNicknames = UI.getNicknames();
         const finalNicknames = [...new Set([...currentNicknames, ...uniqueNewNicknames])];
         
@@ -195,15 +191,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 HISTORY_REF.push(dataToSave)
                     .then(() => {
                         UI.showAlert('성공적으로 저장되었습니다!');
-                    })
-                    .catch((error) => {
-                        console.error("기록 저장 실패:", error);
-                        UI.showAlert("기록 저장에 실패했습니다.");
                     });
             }
-        }).catch((error) => {
-            console.error("현재 데이터 읽기 실패:", error);
-            UI.showAlert("현재 데이터를 읽어오는 데 실패하여 저장할 수 없습니다.");
         });
     }
 
@@ -254,13 +243,43 @@ document.addEventListener('DOMContentLoaded', () => {
                     card.style.transform = '';
                 });
 
-            }).catch(err => {
-                console.error("이미지 캡쳐에 실패했습니다:", err);
-                UI.showAlert("이미지 저장에 실패했습니다. F12를 눌러 콘솔을 확인해주세요.");
             });
         }, 100);
     }
     
+    // --- 저장 내역 불러오기 로직 ---
+    function fetchAndShowHistory() {
+        HISTORY_REF.orderByChild('savedAt').limitToLast(50).once('value', (snapshot) => {
+            if (snapshot.exists()) {
+                const data = snapshot.val();
+                const historyArray = Object.keys(data).map(key => ({
+                    key: key,
+                    data: data[key]
+                })).reverse();
+                UI.displayHistory(historyArray, loadHistoryEntry);
+            } else {
+                UI.displayHistory([]);
+            }
+            UI.togglePopup(UI.historyPopup, true);
+        });
+    }
+    
+    function loadHistoryEntry(key) {
+        HISTORY_REF.child(key).get().then((snapshot) => {
+            if (snapshot.exists()) {
+                const historyData = snapshot.val();
+                const gameData = {
+                    assignments: historyData.assignments,
+                    nicknamesText: historyData.nicknamesText,
+                    isLocked: false,
+                    timestamp: firebase.database.ServerValue.TIMESTAMP
+                };
+                GAME_DATA_REF.set(gameData);
+                UI.togglePopup(UI.historyPopup, false);
+            }
+        });
+    }
+
     // --- 이벤트 리스너 설정 ---
     const allOptionRadios = document.querySelectorAll('input[name="table-option"], input[name="dealer-option"]');
     allOptionRadios.forEach(radio => radio.addEventListener('change', updateOptionsUI));
@@ -293,8 +312,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     imageSaveButton.addEventListener('click', saveCardsAsImage);
-
     confirmCapacityButton.addEventListener('click', () => UI.togglePopup(UI.capacityPopup, false));
+    
+    UI.loadHistoryButton.addEventListener('click', fetchAndShowHistory);
+    UI.closeHistoryButton.addEventListener('click', () => UI.togglePopup(UI.historyPopup, false));
 
     // --- 초기화 ---
     updateOptionsUI();

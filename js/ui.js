@@ -22,6 +22,12 @@ const UI = {
 
     capacityPopup: document.getElementById('capacity-popup'),
 
+    // 저장내역 UI 요소
+    historyPopup: document.getElementById('history-popup'),
+    historyList: document.getElementById('history-list'),
+    loadHistoryButton: document.getElementById('load-history-button'),
+    closeHistoryButton: document.getElementById('close-history-button'),
+
     getNicknames: function(excludeDealers = false) {
         const names = this.nicknamesInput.value.split('\n').map(name => name.trim()).filter(name => name !== '');
         if (excludeDealers) {
@@ -54,7 +60,6 @@ const UI = {
                     selectElement.appendChild(option);
                 }
             });
-            // ✅ 만약 현재 값이 유효하지 않으면 '--선택--'으로 설정
             selectElement.value = currentValue && selectElement.querySelector(`option[value="${currentValue}"]`) ? currentValue : 'none';
         };
 
@@ -107,6 +112,27 @@ const UI = {
     
     togglePopup: function(popupElement, show) {
         popupElement.style.display = show ? 'flex' : 'none';
+    },
+
+    displayHistory: function(historyData, loadCallback) {
+        this.historyList.innerHTML = '';
+        if (!historyData || historyData.length === 0) {
+            this.historyList.innerHTML = '<p style="text-align: center;">저장된 내역이 없습니다.</p>';
+            return;
+        }
+
+        historyData.forEach(item => {
+            const entry = document.createElement('div');
+            entry.className = 'history-item';
+            entry.textContent = item.data.savedAtReadable || '시간 정보 없음';
+            entry.dataset.key = item.key;
+            entry.addEventListener('click', () => {
+                if (confirm(`'${entry.textContent}' 내역을 불러오시겠습니까?`)) {
+                    loadCallback(item.key);
+                }
+            });
+            this.historyList.appendChild(entry);
+        });
     },
 
     addSingleCard: function(nickname, seat) {
