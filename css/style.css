@@ -1,17 +1,21 @@
 @import url('https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700&display=swap');
 
+/* 모던 색상 조합 변수 */
 :root {
-    --bg-color: #1a1a2e;
-    --primary-color: #16213e;
-    --secondary-color: #0f3460;
-    --highlight-color: #e94560;
-    --text-color: #f0f0f0;
+    --bg-color: #D3DAD9; 
+    --container-bg-color: #37353E;
+    --box-bg-color: #44444E;
+    --highlight-color: #715A5A;
+    
+    --primary-text-color: #2b2b2b;
+    --light-text-color: #EAEAEA;
+    --border-color: #5a5a66;
 }
 
 body {
     font-family: 'Nanum Gothic', sans-serif;
     background-color: var(--bg-color);
-    color: var(--text-color);
+    color: var(--primary-text-color); 
     margin: 0;
     padding: 20px;
     display: flex;
@@ -22,21 +26,24 @@ body {
 .container {
     width: 100%;
     max-width: 1200px;
-    background-color: var(--primary-color);
+    background-color: var(--container-bg-color);
     border-radius: 15px;
     padding: 30px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
 }
 
 h1 {
     text-align: center;
-    color: var(--highlight-color);
+    color: var(--light-text-color);
     margin-bottom: 30px;
     font-size: 2.5rem;
+    font-weight: 700;
 }
 
+h2, .popup-content p {
+    color: var(--light-text-color);
+}
 h2 {
-    color: var(--text-color);
     border-left: 4px solid var(--highlight-color);
     padding-left: 10px;
     margin-bottom: 15px;
@@ -50,18 +57,34 @@ h2 {
 
 .nickname-input, .options-input {
     flex: 1;
-    background-color: var(--secondary-color);
+    background-color: var(--box-bg-color);
     padding: 20px;
     border-radius: 10px;
+}
+
+fieldset {
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    padding: 10px;
+    transition: opacity 0.3s ease;
+    color: var(--light-text-color);
+}
+legend {
+    color: var(--highlight-color);
+    font-weight: bold;
+    padding: 0 5px;
+}
+fieldset:disabled {
+    opacity: 0.5;
 }
 
 textarea#nicknames {
     width: 100%;
     height: 200px;
-    background-color: #1a1a2e;
-    border: 1px solid #0f3460;
+    background-color: #2b2a30;
+    border: 1px solid var(--border-color);
     border-radius: 5px;
-    color: var(--text-color);
+    color: var(--light-text-color);
     font-size: 1rem;
     padding: 10px;
     box-sizing: border-box;
@@ -79,13 +102,55 @@ textarea#nicknames {
     font-size: 1.1rem;
 }
 
+.dealer-fix-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.dealer-fix-group label {
+    flex-shrink: 0;
+}
+.dealer-fix-group select {
+    width: auto;
+    min-width: 120px;
+    padding: 5px;
+    border-radius: 3px;
+    border: 1px solid var(--border-color);
+    background-color: #2b2a30;
+    color: var(--light-text-color);
+}
+.direct-input-btn {
+    padding: 5px 10px;
+    border: 1px solid var(--light-text-color);
+    background-color: transparent;
+    color: var(--light-text-color);
+    border-radius: 3px;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: all 0.2s ease;
+}
+.direct-input-btn:hover {
+    background-color: var(--light-text-color);
+    color: #333;
+}
+.dealer-a-group {
+    margin-bottom: 10px;
+}
+
+hr {
+    border: none;
+    height: 1px;
+    background-color: var(--border-color);
+    margin: 15px 0;
+}
+
 .button-container {
     text-align: center;
     margin-bottom: 30px;
 }
 
 #assign-button {
-    background: linear-gradient(45deg, var(--highlight-color), #f97a90);
+    background: var(--highlight-color);
     color: white;
     border: none;
     padding: 15px 40px;
@@ -94,12 +159,12 @@ textarea#nicknames {
     border-radius: 50px;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 5px 15px rgba(233, 69, 96, 0.4);
+    box-shadow: 0 5px 15px #715a5a66;
 }
 
 #assign-button:hover {
     transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgba(233, 69, 96, 0.6);
+    box-shadow: 0 8px 20px #715a5a88;
 }
 
 .sitcard-display {
@@ -112,36 +177,34 @@ textarea#nicknames {
     perspective: 1000px;
 }
 
-/* --- ✅ 이 부분이 수정되었습니다 --- */
 .sitcard {
     width: 150px;
     height: 210px;
-    background-color: #FFD1DC; /* 파스텔 분홍색 배경 */
-    border: 1px solid rgba(0,0,0,0.1);
+    background-color: var(--bg-color);
+    border: 1px solid #b7bdbb;
     border-radius: 10px;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    color: black;
+    color: var(--primary-text-color);
     font-weight: bold;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     text-align: center;
     opacity: 0;
     transform: translateY(100px) rotateX(-90deg);
     animation: rise-up 0.5s ease-out forwards;
 }
-/* --- ✅ 수정 끝 --- */
 
 .sitcard .seat-number {
     font-size: 1.5rem;
-    color: #a30000;
+    color: var(--highlight-color);
     margin-bottom: 15px;
 }
 
 .sitcard .nickname {
     font-size: 1.2rem;
-    background-color: rgba(255, 255, 255, 0.7);
+    background-color: rgba(255, 255, 255, 0.6);
     padding: 5px 10px;
     border-radius: 5px;
     max-width: 90%;
@@ -163,27 +226,29 @@ textarea#nicknames {
 }
 
 .action-btn {
-    background-color: var(--secondary-color);
-    color: var(--text-color);
+    background-color: var(--box-bg-color);
+    color: var(--light-text-color);
     border: 1px solid var(--highlight-color);
     padding: 10px 20px;
     border-radius: 5px;
     cursor: pointer;
-    transition: background-color 0.2s;
+    transition: all 0.2s;
 }
 
 .action-btn:hover:not(:disabled) {
     background-color: var(--highlight-color);
     color: white;
+    border-color: var(--highlight-color);
 }
 
 .action-btn:disabled {
     opacity: 0.5;
-    cursor: not-allowed;
+    cursor: not-allowed !important;
+    background-color: #555 !important;
+    color: #999 !important;
+    border-color: #666 !important;
 }
 
-
-/* 팝업 스타일 */
 .popup-container {
     position: fixed;
     top: 0;
@@ -198,35 +263,50 @@ textarea#nicknames {
 }
 
 .popup-content {
-    background-color: var(--primary-color);
+    background-color: var(--container-bg-color);
     padding: 30px;
     border-radius: 10px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
     text-align: center;
+    border: 1px solid var(--border-color);
 }
 
-#new-nickname-input {
-    width: 100%;
-    padding: 10px;
-    font-size: 1rem;
+.popup-content h2 {
+    border: none;
+}
+
+#new-nicknames-input {
+    width: 300px;
+    height: 150px;
     margin-top: 10px;
     margin-bottom: 20px;
-    box-sizing: border-box;
+    background-color: #2b2a30;
+    border: 1px solid var(--border-color);
+    color: var(--light-text-color);
+    padding: 10px;
+    font-size: 1rem;
 }
 
+.popup-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
 .popup-buttons button {
     padding: 10px 20px;
-    margin: 0 10px;
     border: none;
     border-radius: 5px;
     cursor: pointer;
+    transition: background-color 0.2s;
 }
-#confirm-add-button {
-    background-color: var(--highlight-color);
-    color: white;
-}
-/* ✅ 이 부분만 파일 맨 아래에 추가해주세요 */
-input[type="radio"]:disabled + label {
-    color: #888;
-    cursor: not-allowed;
-}
+
+.confirm-btn { background-color: var(--highlight-color); color: white; }
+.cancel-btn { background-color: #555; color: white; }
+.confirm-btn:hover { background-color: #8a6d6d; }
+.cancel-btn:hover { background-color: #666; }
+
+input[type="radio"]:disabled + label { color: #888; cursor: not-allowed; }
+
+.sitcard.sitcard--dealer-a { background-color: #FFFACD; border-color: #E6DBA4; }
+.sitcard.sitcard--dealer-b { background-color: #FFD1DC; border-color: #E8BBC4; }
+.sitcard.sitcard--table-b { background-color: #ADD8E6; border-color: #9AB4C0; }

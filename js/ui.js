@@ -1,115 +1,128 @@
-// UI 관련 함수들을 모아놓은 모듈
 const UI = {
     nicknamesInput: document.getElementById('nicknames'),
     playerCountSpan: document.getElementById('player-count'),
     sitcardDisplay: document.getElementById('sitcard-display'),
     addPlayerPopup: document.getElementById('add-player-popup'),
-    newNicknameInput: document.getElementById('new-nickname-input'),
+    newNicknamesInput: document.getElementById('new-nicknames-input'),
     actionButtons: document.querySelectorAll('.action-btn'),
-    tableSelectionGroup: document.getElementById('table-selection-group'), // ✅ 추가
 
-    // 플레이어 수 업데이트 + 옵션 UI 업데이트
-    updatePlayerOptions: function(sitCardData) {
-        const nicknames = this.getNicknames();
-        this.playerCountSpan.textContent = nicknames.length;
-        
-        const playerCountKey = `${nicknames.length}명`;
-        const availableOptions = sitCardData[playerCountKey];
+    dealerFixFieldset: document.getElementById('dealer-fix-fieldset'),
+    dealerBGroup: document.getElementById('dealer-b-group'),
+    dealerASelect: document.getElementById('dealer-a-select'),
+    dealerBSelect: document.getElementById('dealer-b-select'),
 
-        // 2테이블 옵션이 있으면 UI 표시, 없으면 숨김
-        if (availableOptions && availableOptions['2_table']) {
-            this.toggleTableSelection(true);
-        } else {
-            this.toggleTableSelection(false);
-        }
-    },
-
-    // ✅ 추가: 테이블 선택 UI 표시/숨김 함수
-    toggleTableSelection: function(show) {
-        this.tableSelectionGroup.style.display = show ? 'block' : 'none';
-        if (!show) {
-            // 숨겨질 때는 항상 1테이블을 기본값으로 선택
-            document.querySelector('input[name="table-option"][value="1_table"]').checked = true;
-        }
-    },
+    reAssignButton: document.getElementById('re-assign-button'),
+    addPlayerButton: document.getElementById('add-player-button'),
+    saveButton: document.getElementById('save-button'),
+    lockButton: document.getElementById('lock-button'),
+    reassignPopup: document.getElementById('reassign-popup'),
     
-    // 입력된 닉네임 목록 가져오기 (공백, 중복 제거)
-    getNicknames: function() {
-        const names = this.nicknamesInput.value
-            .split('\n')
-            .map(name => name.trim())
-            .filter(name => name !== '');
-        return [...new Set(names)]; // 중복 제거
+    saveConfirmPopup: document.getElementById('save-confirm-popup'),
+    saveTimestamp: document.getElementById('save-timestamp'),
+
+    getNicknames: function(excludeDealers = false) {
+        const names = this.nicknamesInput.value.split('\n').map(name => name.trim()).filter(name => name !== '');
+        if (excludeDealers) {
+            const fixedDealerA = this.dealerASelect.value;
+            const fixedDealerB = this.dealerBSelect.value;
+            const fixedDealers = [fixedDealerA, fixedDealerB].filter(d => d && d !== 'none');
+            return [...new Set(names)].filter(name => !fixedDealers.includes(name));
+        }
+        return [...new Set(names)];
     },
 
-    // 싯카드들을 화면에 표시
+    updateDealerDropdowns: function() {
+        const allNicknames = this.getNicknames();
+        const selectedA = this.dealerASelect.value;
+        const selectedB = this.dealerBSelect.value;
+
+        const populate = (selectElement, excludeValue) => {
+            const currentValue = selectElement.value;
+            selectElement.innerHTML = '<option value="none">--선택--</option>';
+            const nicknameSet = new Set(allNicknames);
+
+            if (currentValue && currentValue !== 'none' && !nicknameSet.has(currentValue)) {
+                const directOption = new Option(currentValue, currentValue, true, true);
+                selectElement.appendChild(directOption);
+            }
+
+            allNicknames.forEach(name => {
+                if (name !== excludeValue) {
+                    const option = new Option(name, name);
+                    selectElement.appendChild(option);
+                }
+            });
+            selectElement.value = currentValue; 
+        };
+
+        populate(this.dealerASelect, selectedB);
+        populate(this.dealerBSelect, selectedA);
+    },
+
     displaySitCards: function(assignments) {
         this.sitcardDisplay.innerHTML = '';
+        if (!assignments || assignments.length === 0) return;
+
         let delay = 0;
-        // 좌석 번호 순서대로 정렬하여 표시
+        const getSortOrder = (seat) => {
+            if (seat === '딜A') return 1; if (seat.startsWith('A-')) return 2;
+            if (seat === '딜B') return 3; if (seat.startsWith('B-')) return 4;
+            return 5;
+        };
         const sortedAssignments = [...assignments].sort((a, b) => {
-            const numA = parseInt(a.seat.replace(/[^0-9]/g, ''));
-            const numB = parseInt(b.seat.replace(/[^0-9]/g, ''));
-            if (a.seat.startsWith('B') && b.seat.startsWith('A')) return 1;
-            if (a.seat.startsWith('A') && b.seat.startsWith('B')) return -1;
+            const orderA = getSortOrder(a.seat); const orderB = getSortOrder(b.seat);
+            if (orderA !== orderB) return orderA - orderB;
+            const numA = parseInt(a.seat.replace(/[^0-9]/g, '')) || 0;
+            const numB = parseInt(b.seat.replace(/[^0-9]/g, '')) || 0;
             return numA - numB;
         });
-
         sortedAssignments.forEach(assignment => {
             const card = this.createSitCard(assignment.nickname, assignment.seat);
             card.style.animationDelay = `${delay}s`;
             this.sitcardDisplay.appendChild(card);
             delay += 0.05;
         });
-        
-        if(assignments.length > 0){
-            this.enableActionButtons();
-        }
     },
 
-    // 싯카드 HTML 요소 생성
     createSitCard: function(nickname, seat) {
         const card = document.createElement('div');
         card.className = 'sitcard';
         card.dataset.seat = seat;
-
+        if (seat === '딜A') card.classList.add('sitcard--dealer-a');
+        else if (seat === '딜B') card.classList.add('sitcard--dealer-b');
+        else if (seat.startsWith('B-')) card.classList.add('sitcard--table-b');
         const seatNumber = document.createElement('div');
         seatNumber.className = 'seat-number';
         seatNumber.textContent = seat;
-
         const nicknameDiv = document.createElement('div');
         nicknameDiv.className = 'nickname';
         nicknameDiv.textContent = nickname;
-
         card.appendChild(seatNumber);
         card.appendChild(nicknameDiv);
-
         return card;
     },
     
-    // 추가 인원 팝업 표시/숨김
-    toggleAddPlayerPopup: function(show) {
-        this.addPlayerPopup.style.display = show ? 'flex' : 'none';
-        if (show) {
-            this.newNicknameInput.value = '';
-            this.newNicknameInput.focus();
-        }
+    togglePopup: function(popupElement, show) {
+        popupElement.style.display = show ? 'flex' : 'none';
     },
 
-    // 새로 추가된 플레이어 카드만 표시
     addSingleCard: function(nickname, seat) {
         const card = this.createSitCard(nickname, seat);
         card.style.animationDelay = '0s';
         this.sitcardDisplay.appendChild(card);
     },
 
-    // 결과 출력 후 액션 버튼들 활성화
-    enableActionButtons: function() {
-        this.actionButtons.forEach(btn => btn.disabled = false);
-    },
-
-    // 알림 메시지
-    showAlert: function(message) {
-        alert(message);
+    updateLockState: function(isLocked) {
+        if (isLocked) {
+            this.lockButton.textContent = '🔓 잠금해제';
+            this.reAssignButton.disabled = true;
+            this.addPlayerButton.disabled = true;
+            this.saveButton.disabled = true;
+        } else {
+            this.lockButton.textContent = '🔒 잠금';
+            this.reAssignButton.disabled = false;
+            this.addPlayerButton.disabled = false;
+            this.saveButton.disabled = false;
+        }
     }
 };

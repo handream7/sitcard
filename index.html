@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>싯카드 자동 배정 시스템</title>
+    <title>싯카드 자동배정</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
     <div class="container">
-        <h1>싯카드 자동 배정 시스템</h1>
+        <h1>싯카드 자동배정</h1>
 
         <div class="setup-section">
             <div class="nickname-input">
@@ -20,29 +20,32 @@
 
             <div class="options-input">
                 <h2>2. 옵션 선택</h2>
-                <fieldset id="table-selection-fieldset">
+                <fieldset>
                     <legend>테이블 선택</legend>
                     <div class="option-group">
-                        <label>
-                            <input type="radio" name="table-option" value="1_table" checked> 1 테이블
-                        </label>
-                        <label>
-                            <input type="radio" name="table-option" value="2_table"> 2 테이블
-                        </label>
+                        <label><input type="radio" name="table-option" value="1_table" checked> 1 테이블</label>
+                        <label><input type="radio" name="table-option" value="2_table"> 2 테이블</label>
                     </div>
                 </fieldset>
-
-                <hr style="border-color: #0f3460; margin: 15px 0;">
-
+                <hr>
                 <fieldset>
                     <legend>딜러 선택</legend>
                     <div class="option-group">
-                        <label>
-                            <input type="radio" id="dealer-needed" name="dealer-option" value="needed" checked> 딜러 필요
-                        </label>
-                        <label>
-                            <input type="radio" id="dealer-not-needed" name="dealer-option" value="not-needed"> 딜러 불필요
-                        </label>
+                        <label><input type="radio" id="dealer-needed" name="dealer-option" value="needed" checked> 딜러 필요</label>
+                        <label><input type="radio" id="dealer-not-needed" name="dealer-option" value="not-needed"> 딜러 불필요</label>
+                    </div>
+                </fieldset>
+                <fieldset id="dealer-fix-fieldset">
+                    <legend>딜러 고정</legend>
+                    <div class="dealer-fix-group dealer-a-group">
+                        <label for="dealer-a-select">딜A</label>
+                        <select id="dealer-a-select"></select>
+                        <button id="dealer-a-direct-btn" class="direct-input-btn">직접입력</button>
+                    </div>
+                    <div id="dealer-b-group" class="dealer-fix-group">
+                        <label for="dealer-b-select">딜B</label>
+                        <select id="dealer-b-select"></select>
+                        <button id="dealer-b-direct-btn" class="direct-input-btn">직접입력</button>
                     </div>
                 </fieldset>
             </div>
@@ -52,26 +55,49 @@
             <button id="assign-button">✨ 싯카드 배정하기</button>
         </div>
 
-        <div id="sitcard-display" class="sitcard-display">
-            </div>
+        <div id="sitcard-display" class="sitcard-display"></div>
 
         <div class="action-buttons">
-            <button id="re-assign-button" class="action-btn" disabled>🔄️ 재배치</button>
-            <button id="add-player-button" class="action-btn" disabled>🙋‍♂️ 추가 배치</button>
-            <button id="save-button" class="action-btn" disabled>💾 저장</button>
+            <button id="re-assign-button" class="action-btn">🔄️ 재배치</button>
+            <button id="add-player-button" class="action-btn">🙋‍♂️ 추가 배치</button>
+            <button id="save-button" class="action-btn">💾 저장</button>
+            <button id="lock-button" class="action-btn">🔒 잠금</button>
         </div>
     </div>
 
     <div id="add-player-popup" class="popup-container" style="display: none;">
         <div class="popup-content">
             <h2>추가 인원 닉네임</h2>
-            <input type="text" id="new-nickname-input" placeholder="추가할 닉네임을 입력하세요">
+            <textarea id="new-nicknames-input" placeholder="한 줄에 한 명씩 닉네임을 입력하세요..."></textarea>
             <div class="popup-buttons">
-                <button id="confirm-add-button">추가</button>
-                <button id="cancel-add-button">취소</button>
+                <button id="confirm-add-button" class="confirm-btn">+ 추가하기</button>
+                <button id="cancel-add-button" class="cancel-btn">취소</button>
             </div>
         </div>
     </div>
+    
+    <div id="reassign-popup" class="popup-container" style="display: none;">
+        <div class="popup-content">
+            <h2>재배치 하시겠습니까?</h2>
+            <p>현재 내역은 지워집니다.</p>
+            <div class="popup-buttons">
+                <button id="confirm-reassign-button" class="confirm-btn">확인</button>
+                <button id="cancel-reassign-button" class="cancel-btn">취소</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="save-confirm-popup" class="popup-container" style="display: none;">
+        <div class="popup-content">
+            <h2>내역을 저장하시겠습니까?</h2>
+            <p id="save-timestamp"></p>
+            <div class="popup-buttons">
+                <button id="confirm-save-button" class="confirm-btn">확인</button>
+                <button id="cancel-save-button" class="cancel-btn">취소</button>
+            </div>
+        </div>
+    </div>
+
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <script src="js/firebase-config.js"></script>
