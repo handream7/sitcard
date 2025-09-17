@@ -49,8 +49,10 @@ h2 {
     margin-bottom: 15px;
 }
 
+/* ✅ 항상 세로로 표시되도록 flex-direction 변경 */
 .setup-section {
     display: flex;
+    flex-direction: column; /* 가로(row) -> 세로(column)로 변경 */
     gap: 30px;
     margin-bottom: 30px;
 }
@@ -315,7 +317,13 @@ input[type="radio"]:disabled + label { color: #888; cursor: not-allowed; }
 .sitcard.sitcard--dealer-b { background-color: #FFD1DC; border-color: #E8BBC4; }
 .sitcard.sitcard--table-b { background-color: #ADD8E6; border-color: #9AB4C0; }
 
+/* ✅ --- 모바일 화면을 위한 반응형 코드 수정 --- */
 @media (max-width: 768px) {
+    /* 모바일에서 기본 폰트 크기를 살짝 줄여 전체적인 크기를 조절 */
+    html {
+        font-size: 14px;
+    }
+
     .container {
         padding: 15px;
     }
@@ -324,9 +332,7 @@ input[type="radio"]:disabled + label { color: #888; cursor: not-allowed; }
         font-size: 2rem;
     }
 
-    .setup-section {
-        flex-direction: column;
-    }
+    /* setup-section은 이미 세로 정렬이므로 media query에서 제거 */
 
     .sitcard {
         width: 120px;

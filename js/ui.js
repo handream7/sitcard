@@ -20,6 +20,9 @@ const UI = {
     saveConfirmPopup: document.getElementById('save-confirm-popup'),
     saveTimestamp: document.getElementById('save-timestamp'),
 
+    // ✅ 인원 초과 팝업 UI 요소 추가
+    capacityPopup: document.getElementById('capacity-popup'),
+
     getNicknames: function(excludeDealers = false) {
         const names = this.nicknamesInput.value.split('\n').map(name => name.trim()).filter(name => name !== '');
         if (excludeDealers) {

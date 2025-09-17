@@ -16,6 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const confirmSaveButton = document.getElementById('confirm-save-button');
     const cancelSaveButton = document.getElementById('cancel-save-button');
     const imageSaveButton = document.getElementById('image-save-button');
+    const confirmCapacityButton = document.getElementById('confirm-capacity-button');
 
     const seatPriorities = {
         dealers: ['딜A', '딜B'],
@@ -58,6 +59,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const tableOption = document.querySelector('input[name="table-option"]:checked').value;
         const dealerOption = document.querySelector('input[name="dealer-option"]:checked').value;
+
+        // 인원 초과 체크 로직
+        const maxCapacity = dealerOption === 'needed' ? 14 : 13;
+        if (tableOption === '1_table' && nicknames.length > maxCapacity) {
+            UI.togglePopup(UI.capacityPopup, true);
+            return; // 함수 실행 중단
+        }
 
         if (tableOption === '2_table' && nicknames.length < 10) {
             UI.showAlert('2테이블은 10명 이상부터 가능합니다.'); return;
@@ -201,7 +209,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- ✅ 이미지 저장 함수 (수정) ---
+    // --- 이미지 저장 함수 ---
     function saveCardsAsImage() {
         const captureArea = document.getElementById('sitcard-display');
         if (captureArea.children.length === 0) {
@@ -216,7 +224,7 @@ document.addEventListener('DOMContentLoaded', () => {
             card.style.transform = 'none';
         });
 
-        // DOM이 안정적으로 변경될 시간을 줌 (애니메이션 제거)
+        // DOM이 안정적으로 변경될 시간을 줌
         setTimeout(() => {
             html2canvas(captureArea, {
                 backgroundColor: getComputedStyle(document.querySelector('.container')).backgroundColor,
@@ -231,7 +239,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 link.href = canvas.toDataURL("image/png");
                 link.click();
 
-                // 캡쳐 후에는 애니메이션 스타일을 다시 원래대로 돌려놓음 (선택사항)
+                // 캡쳐 후에는 애니메이션 스타일을 다시 원래대로 돌려놓음
                 Array.from(captureArea.children).forEach(card => {
                     card.style.animation = '';
                     card.style.opacity = '';
@@ -242,7 +250,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.error("이미지 캡쳐에 실패했습니다:", err);
                 UI.showAlert("이미지 저장에 실패했습니다. F12를 눌러 콘솔을 확인해주세요.");
             });
-        }, 100); // 0.1초 대기
+        }, 100);
     }
     
     // --- 이벤트 리스너 설정 ---
@@ -277,6 +285,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     imageSaveButton.addEventListener('click', saveCardsAsImage);
+
+    confirmCapacityButton.addEventListener('click', () => UI.togglePopup(UI.capacityPopup, false));
 
     // --- 초기화 ---
     updateOptionsUI();
