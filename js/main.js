@@ -15,6 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const cancelAddButton = document.getElementById('cancel-add-button');
     const confirmSaveButton = document.getElementById('confirm-save-button');
     const cancelSaveButton = document.getElementById('cancel-save-button');
+    const imageSaveButton = document.getElementById('image-save-button');
 
     const seatPriorities = {
         dealers: ['딜A', '딜B'],
@@ -164,24 +165,26 @@ document.addEventListener('DOMContentLoaded', () => {
         UI.togglePopup(UI.saveConfirmPopup, true);
     }
 
-    // --- ✅ 실제 Firebase에 기록 저장 (버그 수정) ---
+    // --- 실제 Firebase에 기록 저장 ---
     function saveHistory() {
+        UI.togglePopup(UI.saveConfirmPopup, false);
         GAME_DATA_REF.get().then((snapshot) => {
             if (snapshot.exists()) {
                 const dataToSave = snapshot.val();
-                
-                // 팝업에 표시된 사람이 읽을 수 있는 시간도 함께 저장
                 dataToSave.savedAtReadable = UI.saveTimestamp.textContent;
                 dataToSave.savedAt = firebase.database.ServerValue.TIMESTAMP;
-
-                HISTORY_REF.push(dataToSave).then(() => {
-                    UI.showAlert('성공적으로 저장되었습니다!');
-                    UI.togglePopup(UI.saveConfirmPopup, false);
-                }).catch((error) => {
-                    console.error("기록 저장 실패:", error);
-                    UI.showAlert("기록 저장에 실패했습니다.");
-                });
+                HISTORY_REF.push(dataToSave)
+                    .then(() => {
+                        UI.showAlert('성공적으로 저장되었습니다!');
+                    })
+                    .catch((error) => {
+                        console.error("기록 저장 실패:", error);
+                        UI.showAlert("기록 저장에 실패했습니다.");
+                    });
             }
+        }).catch((error) => {
+            console.error("현재 데이터 읽기 실패:", error);
+            UI.showAlert("현재 데이터를 읽어오는 데 실패하여 저장할 수 없습니다.");
         });
     }
 
@@ -196,6 +199,50 @@ document.addEventListener('DOMContentLoaded', () => {
             select.value = name;
             updateOptionsUI();
         }
+    }
+
+    // --- ✅ 이미지 저장 함수 (수정) ---
+    function saveCardsAsImage() {
+        const captureArea = document.getElementById('sitcard-display');
+        if (captureArea.children.length === 0) {
+            UI.showAlert('저장할 싯카드 내역이 없습니다.');
+            return;
+        }
+
+        // 캡쳐 전에 애니메이션 효과를 잠시 제거
+        Array.from(captureArea.children).forEach(card => {
+            card.style.animation = 'none';
+            card.style.opacity = '1';
+            card.style.transform = 'none';
+        });
+
+        // DOM이 안정적으로 변경될 시간을 줌 (애니메이션 제거)
+        setTimeout(() => {
+            html2canvas(captureArea, {
+                backgroundColor: getComputedStyle(document.querySelector('.container')).backgroundColor,
+                scale: 2 
+            }).then(canvas => {
+                const now = new Date();
+                const timestamp = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}_${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}${String(now.getSeconds()).padStart(2, '0')}`;
+                const filename = `sitcard_${timestamp}.png`;
+                
+                const link = document.createElement('a');
+                link.download = filename;
+                link.href = canvas.toDataURL("image/png");
+                link.click();
+
+                // 캡쳐 후에는 애니메이션 스타일을 다시 원래대로 돌려놓음 (선택사항)
+                Array.from(captureArea.children).forEach(card => {
+                    card.style.animation = '';
+                    card.style.opacity = '';
+                    card.style.transform = '';
+                });
+
+            }).catch(err => {
+                console.error("이미지 캡쳐에 실패했습니다:", err);
+                UI.showAlert("이미지 저장에 실패했습니다. F12를 눌러 콘솔을 확인해주세요.");
+            });
+        }, 100); // 0.1초 대기
     }
     
     // --- 이벤트 리스너 설정 ---
@@ -219,7 +266,7 @@ document.addEventListener('DOMContentLoaded', () => {
     cancelAddButton.addEventListener('click', () => { UI.togglePopup(UI.addPlayerPopup, false); UI.newNicknamesInput.value = ''; });
 
     UI.saveButton.addEventListener('click', confirmAndSaveState);
-    confirmSaveButton.addEventListener('click', saveHistory); // ✅ 이 부분이 핵심
+    confirmSaveButton.addEventListener('click', saveHistory);
     cancelSaveButton.addEventListener('click', () => UI.togglePopup(UI.saveConfirmPopup, false));
     
     UI.lockButton.addEventListener('click', () => {
@@ -228,6 +275,8 @@ document.addEventListener('DOMContentLoaded', () => {
             GAME_DATA_REF.child('isLocked').set(!isCurrentlyLocked);
         });
     });
+
+    imageSaveButton.addEventListener('click', saveCardsAsImage);
 
     // --- 초기화 ---
     updateOptionsUI();
