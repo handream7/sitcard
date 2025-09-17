@@ -20,7 +20,6 @@ const UI = {
     saveConfirmPopup: document.getElementById('save-confirm-popup'),
     saveTimestamp: document.getElementById('save-timestamp'),
 
-    // ✅ 인원 초과 팝업 UI 요소 추가
     capacityPopup: document.getElementById('capacity-popup'),
 
     getNicknames: function(excludeDealers = false) {
@@ -55,7 +54,8 @@ const UI = {
                     selectElement.appendChild(option);
                 }
             });
-            selectElement.value = currentValue; 
+            // ✅ 만약 현재 값이 유효하지 않으면 '--선택--'으로 설정
+            selectElement.value = currentValue && selectElement.querySelector(`option[value="${currentValue}"]`) ? currentValue : 'none';
         };
 
         populate(this.dealerASelect, selectedB);

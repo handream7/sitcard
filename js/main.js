@@ -36,23 +36,30 @@ document.addEventListener('DOMContentLoaded', () => {
         UI.updateDealerDropdowns();
     }
 
-    // --- Firebase 실시간 동기화 ---
+    // --- ✅ Firebase 실시간 동기화 (닉네임 목록 추가) ---
     function syncWithFirebase() {
         GAME_DATA_REF.on('value', (snapshot) => {
             const data = snapshot.val();
             if (data) {
+                // 닉네임 목록 동기화
+                UI.nicknamesInput.value = data.nicknamesText || '';
                 currentAssignments = data.assignments || [];
                 UI.displaySitCards(currentAssignments);
                 UI.updateLockState(data.isLocked || false);
+                // 닉네임 목록이 변경되었으므로 UI 업데이트
+                updateOptionsUI();
             } else {
+                // 데이터가 없으면 모두 초기화
+                UI.nicknamesInput.value = '';
                 currentAssignments = [];
                 UI.displaySitCards([]);
                 UI.updateLockState(false);
+                updateOptionsUI();
             }
         });
     }
 
-    // --- 핵심 로직: 배정 및 저장 ---
+    // --- ✅ 핵심 로직: 배정 및 저장 (닉네임 목록 저장 추가) ---
     function assignAndSaveSeats() {
         let nicknames = UI.getNicknames();
         if (nicknames.length === 0) { UI.showAlert('닉네임을 입력해주세요.'); return; }
@@ -60,11 +67,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const tableOption = document.querySelector('input[name="table-option"]:checked').value;
         const dealerOption = document.querySelector('input[name="dealer-option"]:checked').value;
 
-        // 인원 초과 체크 로직
         const maxCapacity = dealerOption === 'needed' ? 14 : 13;
         if (tableOption === '1_table' && nicknames.length > maxCapacity) {
             UI.togglePopup(UI.capacityPopup, true);
-            return; // 함수 실행 중단
+            return;
         }
 
         if (tableOption === '2_table' && nicknames.length < 10) {
@@ -81,9 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (fixedDealerA && fixedDealerA !== 'none') {
                 nonDealerNicknames = nonDealerNicknames.filter(n => n !== fixedDealerA);
             } else {
-                if(nonDealerNicknames.length > 0) {
-                    fixedDealerA = nonDealerNicknames.splice(Math.floor(Math.random() * nonDealerNicknames.length), 1)[0];
-                }
+                if(nonDealerNicknames.length > 0) fixedDealerA = nonDealerNicknames.splice(Math.floor(Math.random() * nonDealerNicknames.length), 1)[0];
             }
             if(fixedDealerA) fixedAssignments.push({ nickname: fixedDealerA, seat: '딜A' });
 
@@ -91,9 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (fixedDealerB && fixedDealerB !== 'none') {
                     nonDealerNicknames = nonDealerNicknames.filter(n => n !== fixedDealerB);
                 } else {
-                    if(nonDealerNicknames.length > 0) {
-                       fixedDealerB = nonDealerNicknames.splice(Math.floor(Math.random() * nonDealerNicknames.length), 1)[0];
-                    }
+                    if(nonDealerNicknames.length > 0) fixedDealerB = nonDealerNicknames.splice(Math.floor(Math.random() * nonDealerNicknames.length), 1)[0];
                 }
                 if(fixedDealerB) fixedAssignments.push({ nickname: fixedDealerB, seat: '딜B' });
             }
@@ -112,6 +114,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const nonDealerAssignments = nonDealerNicknames.map((n, i) => ({ nickname: n, seat: nonDealerSeats[i] }));
         
         const newGameData = {
+            nicknamesText: UI.nicknamesInput.value, // ✅ 닉네임 목록 저장
             assignments: [...fixedAssignments, ...nonDealerAssignments],
             isLocked: false,
             timestamp: firebase.database.ServerValue.TIMESTAMP
@@ -159,7 +162,15 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        GAME_DATA_REF.child('assignments').set(currentAssignments);
+        // 닉네임 목록과 배정 내역을 함께 업데이트
+        const currentNicknames = UI.getNicknames();
+        const finalNicknames = [...new Set([...currentNicknames, ...uniqueNewNicknames])];
+        
+        GAME_DATA_REF.update({
+            assignments: currentAssignments,
+            nicknamesText: finalNicknames.join('\n')
+        });
+
         UI.togglePopup(UI.addPlayerPopup, false);
         UI.newNicknamesInput.value = '';
     }
@@ -217,14 +228,12 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // 캡쳐 전에 애니메이션 효과를 잠시 제거
         Array.from(captureArea.children).forEach(card => {
             card.style.animation = 'none';
             card.style.opacity = '1';
             card.style.transform = 'none';
         });
 
-        // DOM이 안정적으로 변경될 시간을 줌
         setTimeout(() => {
             html2canvas(captureArea, {
                 backgroundColor: getComputedStyle(document.querySelector('.container')).backgroundColor,
@@ -239,7 +248,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 link.href = canvas.toDataURL("image/png");
                 link.click();
 
-                // 캡쳐 후에는 애니메이션 스타일을 다시 원래대로 돌려놓음
                 Array.from(captureArea.children).forEach(card => {
                     card.style.animation = '';
                     card.style.opacity = '';
