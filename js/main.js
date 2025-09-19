@@ -120,7 +120,7 @@ document.addEventListener('DOMContentLoaded', () => {
         GAME_DATA_REF.set(newGameData);
     }
 
-    // --- 추가 배치 로직 ---
+    // --- ✅ 추가 배치 로직 (버그 수정) ---
     function addPlayers() {
         const newNicknames = UI.newNicknamesInput.value.split('\n').map(n => n.trim()).filter(Boolean);
         if (newNicknames.length === 0) { UI.showAlert('추가할 닉네임을 입력해주세요.'); return; }
@@ -131,33 +131,56 @@ document.addEventListener('DOMContentLoaded', () => {
         if (uniqueNewNicknames.length !== newNicknames.length) {
             UI.showAlert('이미 배정된 닉네임은 제외되었습니다.');
         }
-        if (uniqueNewNicknames.length === 0) return;
-
-        let tableACount = currentAssignments.filter(a => a.seat.startsWith('A-')).length;
-        let tableBCount = currentAssignments.filter(a => a.seat.startsWith('B-')).length;
+        if (uniqueNewNicknames.length === 0) {
+            UI.togglePopup(UI.addPlayerPopup, false);
+            UI.newNicknamesInput.value = '';
+            return;
+        }
         
+        // 현재 게임의 테이블 옵션을 확인
+        let tableOption = '1_table';
         const assignedSeats = currentAssignments.map(a => a.seat);
+        if (assignedSeats.some(s => s.startsWith('B-') || s === '딜B')) {
+            tableOption = '2_table';
+        }
+
         let availableASeats = seatPriorities.tableA.filter(s => !assignedSeats.includes(s));
-        let availableBSeats = seatPriorities.tableB.filter(s => !assignedSeats.includes(s));
+        
+        if (tableOption === '1_table') {
+            // 1테이블일 경우, A테이블에만 순차적으로 배정
+            uniqueNewNicknames.forEach(nickname => {
+                const seatToAssign = availableASeats.shift();
+                if (seatToAssign) {
+                    currentAssignments.push({ nickname: nickname, seat: seatToAssign });
+                } else {
+                    UI.showAlert(`'${nickname}'을 배정할 빈 자리가 없습니다.`);
+                }
+            });
+        } else {
+            // 2테이블일 경우, 기존 로직대로 A/B 분배
+            let tableACount = currentAssignments.filter(a => a.seat.startsWith('A-')).length;
+            let tableBCount = currentAssignments.filter(a => a.seat.startsWith('B-')).length;
+            let availableBSeats = seatPriorities.tableB.filter(s => !assignedSeats.includes(s));
 
-        uniqueNewNicknames.forEach(nickname => {
-            let seatToAssign = null;
-            if (tableACount > tableBCount) {
-                seatToAssign = availableBSeats.shift();
-                if (seatToAssign) tableBCount++;
-                else seatToAssign = availableASeats.shift();
-            } else {
-                seatToAssign = availableASeats.shift();
-                if (seatToAssign) tableACount++;
-                else seatToAssign = availableBSeats.shift();
-            }
+            uniqueNewNicknames.forEach(nickname => {
+                let seatToAssign = null;
+                if (tableACount > tableBCount) {
+                    seatToAssign = availableBSeats.shift();
+                    if (seatToAssign) tableBCount++;
+                    else seatToAssign = availableASeats.shift();
+                } else {
+                    seatToAssign = availableASeats.shift();
+                    if (seatToAssign) tableACount++;
+                    else seatToAssign = availableBSeats.shift();
+                }
 
-            if (seatToAssign) {
-                currentAssignments.push({ nickname: nickname, seat: seatToAssign });
-            } else {
-                UI.showAlert(`'${nickname}'을 배정할 빈 자리가 없습니다.`);
-            }
-        });
+                if (seatToAssign) {
+                    currentAssignments.push({ nickname: nickname, seat: seatToAssign });
+                } else {
+                    UI.showAlert(`'${nickname}'을 배정할 빈 자리가 없습니다.`);
+                }
+            });
+        }
 
         const currentNicknames = UI.getNicknames();
         const finalNicknames = [...new Set([...currentNicknames, ...uniqueNewNicknames])];
@@ -271,7 +294,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const gameData = {
                     assignments: historyData.assignments,
                     nicknamesText: historyData.nicknamesText,
-                    isLocked: false,
+                    isLocked: false, 
                     timestamp: firebase.database.ServerValue.TIMESTAMP
                 };
                 GAME_DATA_REF.set(gameData);
