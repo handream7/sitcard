@@ -58,12 +58,12 @@
         <div id="sitcard-display" class="sitcard-display"></div>
 
         <div class="action-buttons">
-            <button id="re-assign-button" class="action-btn">🔄️ 재배치</button>
             <button id="add-player-button" class="action-btn">🙋‍♂️ 추가 배치</button>
             <button id="save-button" class="action-btn">💾 저장</button>
             <button id="lock-button" class="action-btn">🔒 잠금</button>
             <button id="image-save-button" class="action-btn">📸 이미지 저장</button>
             <button id="load-history-button" class="action-btn">📂 저장내역</button>
+            <button id="new-game-button" class="action-btn">✨ 새로운 게임</button>
         </div>
     </div>
 
@@ -74,16 +74,6 @@
             <div class="popup-buttons">
                 <button id="confirm-add-button" class="confirm-btn">+ 추가하기</button>
                 <button id="cancel-add-button" class="cancel-btn">취소</button>
-            </div>
-        </div>
-    </div>
-    <div id="reassign-popup" class="popup-container" style="display: none;">
-        <div class="popup-content">
-            <h2>재배치 하시겠습니까?</h2>
-            <p>현재 내역은 지워집니다.</p>
-            <div class="popup-buttons">
-                <button id="confirm-reassign-button" class="confirm-btn">확인</button>
-                <button id="cancel-reassign-button" class="cancel-btn">취소</button>
             </div>
         </div>
     </div>
@@ -112,6 +102,16 @@
             <div id="history-list" class="history-list"></div>
             <div class="popup-buttons">
                 <button id="close-history-button" class="cancel-btn">닫기</button>
+            </div>
+        </div>
+    </div>
+    <div id="new-game-popup" class="popup-container" style="display: none;">
+        <div class="popup-content">
+            <h2>새 게임을 시작하시겠습니까?</h2>
+            <p>닉네임 목록을 포함한 모든 현재 내역이 초기화됩니다.</p>
+            <div class="popup-buttons">
+                <button id="confirm-new-game-button" class="confirm-btn">확인</button>
+                <button id="cancel-new-game-button" class="cancel-btn">취소</button>
             </div>
         </div>
     </div>

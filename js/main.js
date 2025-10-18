@@ -7,8 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- DOM 요소 ---
     const assignButton = document.getElementById('assign-button');
-    const confirmReassignButton = document.getElementById('confirm-reassign-button');
-    const cancelReassignButton = document.getElementById('cancel-reassign-button');
+    // ✅ 재배치 관련 요소 삭제
     const dealerADirectBtn = document.getElementById('dealer-a-direct-btn');
     const dealerBDirectBtn = document.getElementById('dealer-b-direct-btn');
     const confirmAddButton = document.getElementById('confirm-add-button');
@@ -17,6 +16,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const cancelSaveButton = document.getElementById('cancel-save-button');
     const imageSaveButton = document.getElementById('image-save-button');
     const confirmCapacityButton = document.getElementById('confirm-capacity-button');
+    const confirmNewGameButton = document.getElementById('confirm-new-game-button');
+    const cancelNewGameButton = document.getElementById('cancel-new-game-button');
 
     const seatPriorities = {
         dealers: ['딜A', '딜B'],
@@ -120,7 +121,7 @@ document.addEventListener('DOMContentLoaded', () => {
         GAME_DATA_REF.set(newGameData);
     }
 
-    // --- ✅ 추가 배치 로직 (버그 수정) ---
+    // --- 추가 배치 로직 ---
     function addPlayers() {
         const newNicknames = UI.newNicknamesInput.value.split('\n').map(n => n.trim()).filter(Boolean);
         if (newNicknames.length === 0) { UI.showAlert('추가할 닉네임을 입력해주세요.'); return; }
@@ -137,7 +138,6 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         
-        // 현재 게임의 테이블 옵션을 확인
         let tableOption = '1_table';
         const assignedSeats = currentAssignments.map(a => a.seat);
         if (assignedSeats.some(s => s.startsWith('B-') || s === '딜B')) {
@@ -147,7 +147,6 @@ document.addEventListener('DOMContentLoaded', () => {
         let availableASeats = seatPriorities.tableA.filter(s => !assignedSeats.includes(s));
         
         if (tableOption === '1_table') {
-            // 1테이블일 경우, A테이블에만 순차적으로 배정
             uniqueNewNicknames.forEach(nickname => {
                 const seatToAssign = availableASeats.shift();
                 if (seatToAssign) {
@@ -157,7 +156,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
         } else {
-            // 2테이블일 경우, 기존 로직대로 A/B 분배
             let tableACount = currentAssignments.filter(a => a.seat.startsWith('A-')).length;
             let tableBCount = currentAssignments.filter(a => a.seat.startsWith('B-')).length;
             let availableBSeats = seatPriorities.tableB.filter(s => !assignedSeats.includes(s));
@@ -315,9 +313,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     assignButton.addEventListener('click', assignAndSaveSeats);
     
-    UI.reAssignButton.addEventListener('click', () => UI.togglePopup(UI.reassignPopup, true));
-    confirmReassignButton.addEventListener('click', () => { GAME_DATA_REF.set(null); UI.togglePopup(UI.reassignPopup, false); });
-    cancelReassignButton.addEventListener('click', () => UI.togglePopup(UI.reassignPopup, false));
+    // ✅ 재배치 리스너 삭제
     
     UI.addPlayerButton.addEventListener('click', () => UI.togglePopup(UI.addPlayerPopup, true));
     confirmAddButton.addEventListener('click', addPlayers);
@@ -339,6 +335,10 @@ document.addEventListener('DOMContentLoaded', () => {
     
     UI.loadHistoryButton.addEventListener('click', fetchAndShowHistory);
     UI.closeHistoryButton.addEventListener('click', () => UI.togglePopup(UI.historyPopup, false));
+    
+    UI.newGameButton.addEventListener('click', () => UI.togglePopup(UI.newGamePopup, true));
+    confirmNewGameButton.addEventListener('click', () => { GAME_DATA_REF.set(null); UI.togglePopup(UI.newGamePopup, false); });
+    cancelNewGameButton.addEventListener('click', () => UI.togglePopup(UI.newGamePopup, false));
 
     // --- 초기화 ---
     updateOptionsUI();

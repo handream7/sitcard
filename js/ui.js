@@ -11,22 +11,23 @@ const UI = {
     dealerASelect: document.getElementById('dealer-a-select'),
     dealerBSelect: document.getElementById('dealer-b-select'),
 
-    reAssignButton: document.getElementById('re-assign-button'),
+    // ✅ 재배치 버튼 관련 요소 삭제
     addPlayerButton: document.getElementById('add-player-button'),
     saveButton: document.getElementById('save-button'),
     lockButton: document.getElementById('lock-button'),
-    reassignPopup: document.getElementById('reassign-popup'),
     
     saveConfirmPopup: document.getElementById('save-confirm-popup'),
     saveTimestamp: document.getElementById('save-timestamp'),
 
     capacityPopup: document.getElementById('capacity-popup'),
 
-    // 저장내역 UI 요소
     historyPopup: document.getElementById('history-popup'),
     historyList: document.getElementById('history-list'),
     loadHistoryButton: document.getElementById('load-history-button'),
     closeHistoryButton: document.getElementById('close-history-button'),
+
+    newGameButton: document.getElementById('new-game-button'),
+    newGamePopup: document.getElementById('new-game-popup'),
 
     getNicknames: function(excludeDealers = false) {
         const names = this.nicknamesInput.value.split('\n').map(name => name.trim()).filter(name => name !== '');
@@ -144,12 +145,12 @@ const UI = {
     updateLockState: function(isLocked) {
         if (isLocked) {
             this.lockButton.textContent = '🔓 잠금해제';
-            this.reAssignButton.disabled = true;
+            // 재배치 버튼이 없으므로 해당 라인 삭제
             this.addPlayerButton.disabled = true;
             this.saveButton.disabled = true;
         } else {
             this.lockButton.textContent = '🔒 잠금';
-            this.reAssignButton.disabled = false;
+            // 재배치 버튼이 없으므로 해당 라인 삭제
             this.addPlayerButton.disabled = false;
             this.saveButton.disabled = false;
         }
